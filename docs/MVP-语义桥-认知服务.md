@@ -143,7 +143,32 @@ r = sb.enhance("产品成熟宜投放", llm_fn=lambda sk: "…")  # LLM 可注�
 
 → 同一处境，符号给可演算骨架（向量/卦/五域/距离），LLM（主模型）填自然语言，二者合一。
 
-## 十一、运行方式
+## 十一、接入 Agent 运行时（agent_tool.py · 认知原语工具）
+
+把语义桥封装为 Agent 可挂载的**工具注册表**（name / callable / desc）：
+
+| 工具 | 作用 |
+|---|---|
+| `sanjiu.encode` | 状态→9维向量（19683 坐标） |
+| `sanjiu.search` | 向量→Top-N 最近邻卦 |
+| `sanjiu.bridge` | 编号→五域解读+深度卦典 |
+| `sanjiu.fingerprint` | 卦→结构倾向 |
+| `sanjiu.decide` | **全链路认知决策辅助**（定位+五域+卦典+行动建议） |
+| `sanjiu.domains` | 五域清单 |
+
+Agent 决策示范（`python3 service/agent_tool.py`）——对"生态下一阶段应偏产品落地
+还是继续扩张"这个战略处境：
+
+| 通道 | 定位 | 行动建议 |
+|---|---|---|
+| 纯符号 encode | 阳·悔亡·**察动度卦**·谋定后动 | 机在枢纽未熟，勿躁进 |
+| **LLM 注入** | 阳·元亨·**启转度卦**·乘势而行 | 宜乘势主动推进，把握当机，防过亢 |
+
+→ LLM 注入更贴实境（根基/引擎已就绪 → 宜主动作为而非保守），示范了
+"Agent 用认知层辅助决策"：桥给结构化认知参考（向量/卦/五域/卦典/倾向），
+Agent 结合业务判断给出最终决策。**桥是认知辅助，不替代人/业务判断。**
+
+## 十二、运行方式
 
 ```bash
 cd sanjiu-ecosystem/service
@@ -152,10 +177,11 @@ python3 _audit_bridge.py   # 一致性验证（12 卦抽样，5 域 + 深度象�
 python3 generalize.py      # 台阶三雏形 · 邻域泛化推理（6 处境演示）
 python3 enhance.py         # 增强接口（符号骨架 + LLM 注入点）
 python3 llm_mix.py         # LLM 混合主链路（主模型注入 + 人类解读）
+python3 agent_tool.py      # 认知原语工具注册表 + Agent 决策示范
 ```
 
-## 十二、下一步
+## 十三、下一步
 
-1. **接入宿主 Agent 运行时**：把 CLI/包作为工具原语接入 Agent（兑现"Agent 认知层"）。
+1. **产品落地**：把这套认知引擎接回卦典 APK / 应用，做成可用产品升级。
 2. 领域继续自适配接入（更多应用仓 manifest）。
 3. 可选：配置真实 LLM API 时走 `llm_decoder.decode_with_real_llm` 通道。
