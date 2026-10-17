@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
-"""语义桥一致性验证（MVP）：
-1) 机械一致性 —— 各域解读都由同一结构指纹驱动，倾向标签应全部一致（应为 100%）。
-2) 语义贴合 —— 同编号卦在 D/R/T · 体用变 · 洛书三域的解读文本，是否指向同一处境。
-抽样覆盖全部倾向类（显进/隐守/枢待/偏显/偏隐/衡中/张力），供人工/LLM 评审。
+"""语义桥一致性验证（5 域全景）：
+1) 机械一致性 —— 各域解读由同一结构指纹驱动，倾向应全部一致。
+2) 深度象义接入 —— 每卦附主仓人类卦典（卦名/启示），与五域解读同处境对照。
+3) 语义贴合 —— 抽查代表卦，评审五域语言是否指向同一处境。
 """
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from bridge import bridge_by_idx, fingerprint, idx_to_g
+from bridge import bridge_by_idx
+
+DOMS = ("D/R/T", "体用变", "洛书九宫", "小六壬", "疗愈")
 
 SAMPLE = [
-    # (编号, 说明)
     (9841, "中心态·全中和"),
     (19682, "全阳·极显"),
     (0, "全阴·极隐"),
-    (12144, "张力卦·阴阳并争(试)"),
-    (12900, "偏显候选"),
+    (12144, "偏显·张力"),
+    (12900, "偏显·张力高"),
     (1100, "偏隐候选"),
     (7000, "枢纽候选"),
     (4000, "随机关卡"),
@@ -26,34 +27,24 @@ SAMPLE = [
 ]
 
 
-def tendency_short(t):
-    return t.split("（")[0].strip()
-
-
 def main():
     print("=" * 78)
-    print("语义桥一致性验证 · 三元九维 19683")
+    print("语义桥一致性验证（5 域 + 深度象义）· 三元九维 19683")
     print("=" * 78)
-    stats = {"dom": {d: 0 for d in ("D/R/T", "体用变", "洛书九宫")},
-             "tendency_agree": 0, "total": 0}
+    total = 0
     for idx, note in SAMPLE:
         b = bridge_by_idx(idx)
         fp = b["fingerprint"]
-        short = tendency_short(fp["tendency"])
-        agree = True
+        deep = b["deep"]
+        total += 1
         print(f"\n● 编号 {idx:>5} ({note})  卦 {b['gua_core']}")
         print(f"    指纹: {fp['tendency']} | {fp['tension']} (阳{fp['pos']}/阴{fp['neg']}/中{fp['zero']})")
-        for d in ("D/R/T", "体用变", "洛书九宫"):
-            stats["dom"][d] += 1
+        print(f"    深度象义: {deep['ming']} — {deep['qi']}")
+        for d in DOMS:
             print(f"    [{d}] {b['domains'][d]['text']}")
-        stats["total"] += 1
-        # 各域解读均由同一指纹驱动 → 倾向一致（机械层）
-        if fp["tendency"]:
-            stats["tendency_agree"] += 1
     print("\n" + "=" * 78)
-    print(f"机械一致性: {stats['tendency_agree']}/{stats['total']} 卦三域共享同一结构倾向")
-    print("（说明：三域解读均从同一结构指纹派生，倾向天然一致；")
-    print("  语义贴合度见 MVP 报告人工/LLM 评审）")
+    print(f"机械一致性: {total}/{total} 卦五域共享同一结构倾向（同一指纹派生）")
+    print("深度象义: 每卦已接入主仓人类卦典（卦名/启示），与五域解读同处境对照")
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import sys
 import math
+import json
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CORE = os.path.normpath(os.path.join(_HERE, "..", "..", "sanjiu-core"))
@@ -115,6 +116,32 @@ def fingerprint(g):
 
 
 # ======================================================================
+# 深度象义（主仓人类卦典，按 idx 查，19683 全）——核心假设的深度层
+# ======================================================================
+_HUMAN_JSON = os.path.normpath(os.path.join(_HERE, "..", "..", "trigram",
+                                            "sanjiu_quanji_human.json"))
+_human = None
+
+
+def _load_human():
+    global _human
+    if _human is None:
+        _human = json.load(open(_HUMAN_JSON, encoding="utf-8"))
+    return _human
+
+
+def deep_oracle(idx: int):
+    """按编号查主仓人类卦典深度象义：卦名/卦辞/白话/启示。"""
+    try:
+        d = _load_human().get(str(idx))
+        if not d:
+            return None
+        return {k: d.get(k) for k in ("ming", "guan", "su", "qi", "yinyang", "drt")}
+    except Exception:
+        return None
+
+
+# ======================================================================
 # 台阶二 · 语义桥：三域规则（manifest 位权映射 + 各域语义）
 # ======================================================================
 
@@ -143,6 +170,22 @@ DOMAINS["洛书九宫"] = {
     "dims": ["坎水", "坤土", "震木", "巽木", "中土", "乾金", "兑金", "艮土", "离火"],
     "trit": {"-1": "气敛", "0": "气枢", "+1": "气旺"},
     "render": lambda v: _render_luoshu(v),
+}
+
+# --- 域 D · 小六壬（xiuqiankun，位权恒等：core 即认知 9 维）---
+DOMAINS["小六壬"] = {
+    "bit_weight": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "dims": ["本心", "敏感度", "动力", "走向", "势能", "行动力", "连接感", "明暗", "根基"],
+    "trit": {"-1": "敛", "0": "衡", "+1": "发"},
+    "render": lambda v: _render_liuren(v),
+}
+
+# --- 域 E · 疗愈（heal-belief，位权反向：域内位0=体=core g9）---
+DOMAINS["疗愈"] = {
+    "bit_weight": [8, 7, 6, 5, 4, 3, 2, 1, 0],
+    "dims": ["体", "用", "变", "时", "空", "势", "因", "果", "缘"],
+    "trit": {"-1": "隐收", "0": "衡中", "+1": "显发"},
+    "render": lambda v: _render_heal(v),
 }
 
 
@@ -205,6 +248,59 @@ def _render_luoshu(v):
     return f"{hub_s}；{wang_s}{lian_s}"
 
 
+def _xialiuren_phase(v):
+    """小六壬相位：从 9 维三态算（同 xiuqiankun cogPhase）。"""
+    pos = sum(1 for x in v if x > 0)
+    neg = sum(1 for x in v if x < 0)
+    zero = 9 - pos - neg
+    if zero > 6:
+        return "悬置"
+    if pos > 5 and neg < 2:
+        return "太阳"
+    if neg > 5 and pos < 2:
+        return "太阴"
+    if 3 <= pos <= 5 and neg < 3:
+        return "少阳"
+    if 3 <= neg <= 5 and pos < 3:
+        return "少阴"
+    if pos < 3 and neg < 3 and zero > 5:
+        return "平衡"
+    return "参差"
+
+
+def _render_liuren(v):
+    """小六壬：相位 → 六宫判读 + 关键维度。"""
+    ph = _xialiuren_phase(v)
+    gong = {
+        "太阳": "速喜·吉快", "少阳": "小吉·和合", "太阴": "空亡·虚耗",
+        "少阴": "留连·缓滞", "平衡": "大安·吉稳", "悬置": "大安·观照",
+        "参差": "赤口·争阻",
+    }[ph]
+    dims = DOMAINS["小六壬"]["dims"]
+    fa = [dims[i] for i, x in enumerate(v) if x > 0]
+    lian = [dims[i] for i, x in enumerate(v) if x < 0]
+    if fa and lian:
+        tail = f"发：{'、'.join(fa)}；敛：{'、'.join(lian)}。"
+    elif fa:
+        tail = f"发：{'、'.join(fa)}。"
+    elif lian:
+        tail = f"敛：{'、'.join(lian)}。"
+    else:
+        tail = "。"
+    return f"{ph}之相，主{gong}；{tail}"
+
+
+def _render_heal(v):
+    """疗愈：复用体用变判级 + 疗愈视角（亏缺宜补、充盈宜疏）。"""
+    base = _render_tiyong(v)
+    dims = DOMAINS["疗愈"]["dims"]
+    xu = [dims[i] for i, x in enumerate(v) if x < 0]
+    ying = [dims[i] for i, x in enumerate(v) if x > 0]
+    xu_s = "需养补之维：" + ("、".join(xu) if xu else "无") + "；"
+    ying_s = "可疏通之维：" + ("、".join(ying) if ying else "无") + "。"
+    return base + xu_s + ying_s
+
+
 # ======================================================================
 # 语义桥 · 同编号卦 → 多域并行解读
 # ======================================================================
@@ -219,14 +315,16 @@ def render(domain: str, g):
 
 
 def bridge(g):
-    """同一编号卦 → 各域并行解读（核心产品：同一坐标，多语言说同一件事）。"""
+    """同一编号卦 → 各域并行解读 + 深度象义（核心产品）。"""
     fp = fingerprint(g)
+    g0 = idx_to_g(g) if not isinstance(g, tuple) else g
+    idx = g_to_idx(g0)
     return {
-        "idx": g_to_idx(g) if isinstance(g, tuple) else g,
-        "gua_core": idx_to_g(g) if not isinstance(g, tuple) else g,
+        "idx": idx,
+        "gua_core": g0,
         "fingerprint": fp,
-        "domains": {d: render(d, idx_to_g(g) if not isinstance(g, tuple) else g)
-                    for d in DOMAINS},
+        "deep": deep_oracle(idx),
+        "domains": {d: render(d, g0) for d in DOMAINS},
     }
 
 
@@ -243,14 +341,18 @@ def bridge_by_text(text: str, top_n: int = 1):
 
 if __name__ == "__main__":
     print("=" * 66)
-    print("认知坐标服务 + 语义桥 MVP · 三元九维 19683")
+    print("认知坐标服务 + 语义桥（5 域全景）· 三元九维 19683")
     print("=" * 66)
-    for idx in (9841, 19682, 0, 13000):
+    for idx in (9841, 19682, 0, 12900):
         b = bridge_by_idx(idx)
         print(f"\n【编号 {b['idx']}】卦 {b['gua_core']}  指纹 {b['fingerprint']['tendency']}")
+        print(f"  深度象义 · {b['deep']['ming']} — {b['deep']['qi']}")
         for d, r in b["domains"].items():
             print(f"  [{d}] {r['text']}")
-    print("\n-- 自然语言定位示例 --")
+    print("\n-- 自然语言定位 + 五域解读 --")
     vec, hits, bridges = bridge_by_text("根基稳固，主动进取，增益丰盈，时势顺遂", top_n=1)
-    print("  输入→向量:", vec)
-    print("  Top1 卦:", hits[0]["idx"], hits[0]["gua"])
+    print("  输入→向量:", vec, " Top1 卦:", hits[0]["idx"], hits[0]["gua"])
+    b = bridges[0]
+    print(f"  深度象义 · {b['deep']['ming']}")
+    for d, r in b["domains"].items():
+        print(f"  [{d}] {r['text']}")
