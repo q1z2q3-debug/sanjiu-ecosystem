@@ -27,7 +27,8 @@
 - LLM混合：[service/llm_mix.py](service/llm_mix.py)（接入即是我自己：主模型注入 + 人类解读）
 - Agent工具：[service/agent_tool.py](service/agent_tool.py)（认知原语工具注册表 + decide 决策辅助）
 - 认知引擎App：[app/cognitive-engine.html](app/cognitive-engine.html)（输入处境→定位卦→五域+卦典+决策建议，浏览器可直接运行，亦为 APK assets 基础）
-- 认知引擎APK：[app/cognitive-engine.apk](app/cognitive-engine.apk)（WebView 版，由 sanjiu-apk-builder v0.2.0 `--mode web` 云端构建，签名）
+- 认知引擎APK：[app/cognitive-engine.apk](app/cognitive-engine.apk)（v0.3.0：WebView + **全量卦典19683** + 自定义图标，签名，Release 附 [sanjiu-apk-builder v0.3.0](https://github.com/q1z2q3-debug/sanjiu-apk-builder/releases/tag/v0.3.0)）
+- 全量卦典数据：[app/quanji_cog.js](app/quanji_cog.js)（19683 条，idx→[卦名,卦辞,启示]，WebApp 自动加载）
 - 验证：[service/_audit_bridge.py](service/_audit_bridge.py)（一致性 12/12）
 - 报告：[docs/MVP-语义桥-认知服务.md](docs/MVP-语义桥-认知服务.md)
 
