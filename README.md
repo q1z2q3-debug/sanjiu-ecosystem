@@ -24,6 +24,7 @@
 - 泛化：[service/generalize.py](service/generalize.py)（台阶三雏形·邻域泛化推理）
 - CLI：[service/cli.py](service/cli.py)（认知原语统一入口 encode/search/bridge/generalize/enhance）
 - 增强接口：[service/enhance.py](service/enhance.py)（符号骨架 + LLM 注入点）
+- LLM混合：[service/llm_mix.py](service/llm_mix.py)（接入即是我自己：主模型注入 + 人类解读）
 - 验证：[service/_audit_bridge.py](service/_audit_bridge.py)（一致性 12/12）
 - 报告：[docs/MVP-语义桥-认知服务.md](docs/MVP-语义桥-认知服务.md)
 
