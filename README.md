@@ -17,6 +17,8 @@
 
 ## 生态地图（仓库导航）
 
+> 📊 **可视化架构图**：[docs/ecosystem-map.html](docs/ecosystem-map.html)（浏览器打开，ECharts 分层关系图）
+
 ### 1. 形式层（唯一底座）
 | 仓库 | 定位 |
 |---|---|

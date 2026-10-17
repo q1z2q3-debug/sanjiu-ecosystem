@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三元九维 19683 · 生态架构地图</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  body{margin:0;background:#0e1420;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#e8edf4}
+  header{padding:26px 34px 8px;border-bottom:1px solid #1d2a3a}
+  h1{margin:0;font-size:22px;font-weight:700;letter-spacing:2px}
+  .sub{color:#7c8aa0;font-size:13px;margin-top:6px}
+  #map{width:100%;height:calc(100vh - 130px)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;padding:8px 34px;font-size:12px;color:#aab6c8}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  footer{padding:10px 34px;font-size:12px;color:#5c6b7f}
+</style>
+</head>
+<body>
+<header>
+  <h1>三元九维 19683 · 生态架构地图</h1>
+  <div class="sub">形式统一（唯一数理底座 sanjiu-core）+ 语义自适配（各仓 manifest 声明）· 3⁹ = 19683 状态空间</div>
+</header>
+<div class="legend">
+  <span><i style="background:#4f6df5"></i>形式层（唯一数学底座）</span>
+  <span><i style="background:#2eb872"></i>语义自适配层（manifest 位权已核）</span>
+  <span><i style="background:#f0a500"></i>应用落地层</span>
+  <span><i style="background:#c05a8f"></i>量化研究层</span>
+</div>
+<div id="map"></div>
+<footer>sanjiu-core · sanjiu-ecosystem — 位权两类：正向恒等[0..8]（tri9/meihua/xiuqiankun/sanjiu-nine）· 反向[8..0]（cog-layer/heal/hexq，hexq 另 +1 偏移）</footer>
+<script>
+const nodes = [
+  // 形式层
+  {id:'core',name:'sanjiu-core\n形式层·唯一底座',category:0,symbolSize:56,itemStyle:{color:'#4f6df5',borderColor:'#8fa5ff'}},
+  // 语义自适配层（正向 / 反向）
+  {id:'nine',name:'sanjiu-nine\nD/R/T · 主仓',category:1,symbolSize:40,itemStyle:{color:'#2eb872'}},
+  {id:'tri9',name:'tri9-cog\nT时/S空/C因果',category:1,symbolSize:36,itemStyle:{color:'#2eb872'}},
+  {id:'meihua',name:'meihua\n洛书九宫·梅花',category:1,symbolSize:36,itemStyle:{color:'#2eb872'}},
+  {id:'xiuq',name:'xiuqiankun\n小六壬×九维',category:1,symbolSize:36,itemStyle:{color:'#2eb872'}},
+  {id:'cog',name:'cog-layer\n体用变时空势因果缘',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
+  {id:'heal',name:'heal-belief\n体用变·疗愈',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
+  {id:'hexq',name:'hexq-prod\n体用变·1-based',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
+  // 应用落地层
+  {id:'apk',name:'sanjiu-apk-builder\nAPK构建插件',category:2,symbolSize:32,itemStyle:{color:'#f0a500'}},
+  {id:'poem',name:'卦典·诗歌·APK\n(卦辞/人类转译/诗词)',category:2,symbolSize:32,itemStyle:{color:'#f0a500'}},
+  {id:'meihuaapp',name:'meihua-yishu-app\n全息占APK',category:2,symbolSize:30,itemStyle:{color:'#f0a500'}},
+  {id:'xiuqapp',name:'xiuqiankun-app\n掐指占APK',category:2,symbolSize:30,itemStyle:{color:'#f0a500'}},
+  // 量化层
+  {id:'arch',name:'archon-19683',category:3,symbolSize:30,itemStyle:{color:'#c05a8f'}},
+  {id:'alpha',name:'cognitive-space-alpha',category:3,symbolSize:30,itemStyle:{color:'#c05a8f'}},
+  {id:'sfw',name:'sfw-cognitive',category:3,symbolSize:30,itemStyle:{color:'#c05a8f'}},
+];
+const links = [
+  {source:'core',target:'nine'},{source:'core',target:'tri9'},{source:'core',target:'meihua'},{source:'core',target:'xiuq'},
+  {source:'core',target:'cog'},{source:'core',target:'heal'},{source:'core',target:'hexq'},
+  {source:'nine',target:'apk'},{source:'nine',target:'poem'},
+  {source:'meihua',target:'meihuaapp'},{source:'xiuq',target:'xiuqapp'},
+  {source:'nine',target:'arch'},{source:'nine',target:'alpha'},{source:'nine',target:'sfw'},
+];
+const cats = [
+  {name:'形式层·唯一底座',itemStyle:{color:'#4f6df5'}},
+  {name:'语义自适配层(位权已核)',itemStyle:{color:'#2eb872'}},
+  {name:'应用落地层',itemStyle:{color:'#f0a500'}},
+  {name:'量化研究层',itemStyle:{color:'#c05a8f'}},
+];
+const chart = echarts.init(document.getElementById('map'));
+chart.setOption({
+  backgroundColor:'transparent',
+  legend:{data:cats.map(c=>c.name),textStyle:{color:'#aab6c8'},top:8},
+  series:[{
+    type:'graph',layout:'force',roam:true,
+    label:{show:true,position:'right',color:'#dde5f0',fontSize:12,lineHeight:16,
+      formatter:p=>p.name.split('\n').map((s,i)=>i===0?`<b style="font-weight:700">${s}</b>`:s).join('<br/>')},
+    edgeSymbol:['none','arrow'],edgeSymbolSize:[0,7],edgeLabel:{show:false},
+    lineStyle:{color:'#2a3b52',width:1.4,curveness:0.05},
+    emphasis:{focus:'adjacency',lineStyle:{width:3}},
+    force:{repulsion:320,edgeLength:[90,180],gravity:0.08},
+    categories:cats.map(c=>({name:c.name})),
+    data:nodes.map(n=>({...n}),
+    links,
+  }]
+});
+window.addEventListener('resize',()=>chart.resize());
+</script>
+</body>
+</html>
