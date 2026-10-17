@@ -90,17 +90,50 @@ sanjiu-core（唯一数学底座，不动）──算子/索引/距离/等价组
 > 已知限制：`encode` 为纯符号词表，语义分辨率有限（这是"自然语言→向量"编码环节，
 > 正是后续与 LLM 混合的落点——LLM 补语义分辨率，符号给可演算骨架）。
 
-## 九、运行方式
+## 九、工程化：认知原语包 + CLI + 增强接口
+
+把语义桥封装为**可被 Agent / 脚本调用的认知原语**（兑现"Agent 认知层"落点）：
+
+```
+service/  （认知原语包，import service，v0.2.0）
+  bridge.py     encode(加权语义打分) / search / transform / render / bridge / deep_oracle
+  generalize.py 已知处境→最近邻卦→深度卦典启示（知识迁移）
+  enhance.py    增强接口：默认符号骨架 + 可注入 llm_fn（符号给骨架、LLM 填自然语言）
+  cli.py        统一 CLI 入口（encode / search / bridge / generalize / enhance / domains）
+```
+
+CLI 用法（在 sanjiu-ecosystem 下）：
+```bash
+cd sanjiu-ecosystem
+python3 service/cli.py encode "行情震荡宜避险"        # → 9维向量
+python3 service/cli.py search "行情震荡宜避险" --top 3 # → Top-N 最近邻卦
+python3 service/cli.py bridge 9841                    # → 编号→五域解读+深度象义
+python3 service/cli.py generalize "团队争执需先协调"   # → 邻域泛化推理
+python3 service/cli.py enhance "产品成熟宜投放"        # → 符号骨架+泛化总结
+python3 service/cli.py domains                        # → 五域清单
+```
+
+包调用：
+```python
+import sys; sys.path.insert(0, "sanjiu-ecosystem")
+import service as sb
+v = sb.encode("行情震荡宜避险")          # (0,0,-1,-1,0,0,0,0,0)
+b = sb.bridge_by_idx(9841)              # 五域解读 + 深度象义
+r = sb.enhance("产品成熟宜投放", llm_fn=lambda sk: "…")  # LLM 可注入
+```
+
+## 十、运行方式
 
 ```bash
 cd sanjiu-ecosystem/service
 python3 bridge.py          # 五域全景演示 + 深度象义 + 自然语言定位
 python3 _audit_bridge.py   # 一致性验证（12 卦抽样，5 域 + 深度象义）
 python3 generalize.py      # 台阶三雏形 · 邻域泛化推理（6 处境演示）
+python3 enhance.py         # 增强接口（符号骨架 + LLM 注入点）
 ```
 
-## 十、下一步
+## 十一、下一步
 
-1. **LLM 混合**：符号给可演算骨架，LLM 填自然语言（提升 encode 分辨率 + 泛化启示润色）。
-2. **桥封装为 Agent 工具**：让语义桥成为 Agent 可调用的认知原语（兑现"Agent 认知层"）。
-3. 领域继续自适配接入（如更多应用仓 manifest）。
+1. **LLM 混合落地**：`enhance` 已留注入点，接入真实 LLM 提升 encode 分辨率 + 启示润色。
+2. **桥接入 Agent 运行时**：作为工具原语接入宿主 Agent（兑现"Agent 认知层"）。
+3. 领域继续自适配接入（更多应用仓 manifest）。
