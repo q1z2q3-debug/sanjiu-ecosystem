@@ -15,6 +15,15 @@
    └──────────┴──────────┴──────────┴───────────┴──────────┘
 ```
 
+## 认知服务 + 语义桥（MVP）
+
+把 19683 从「符号库」升级为「认知引擎」：同一编号卦在各已适配领域
+（D/R/T · 体用变 · 洛书九宫）各自从卦象义长出解读 —— 同一坐标、多语言说同一件事。
+
+- 源码：[service/bridge.py](service/bridge.py)（认知坐标原语 + 三域语义桥）
+- 验证：[service/_audit_bridge.py](service/_audit_bridge.py)（一致性 12/12）
+- 报告：[docs/MVP-语义桥-认知服务.md](docs/MVP-语义桥-认知服务.md)
+
 ## 生态地图（仓库导航）
 
 > 📊 **可视化架构图**：[docs/ecosystem-map.html](docs/ecosystem-map.html)（浏览器打开，ECharts 分层关系图）
