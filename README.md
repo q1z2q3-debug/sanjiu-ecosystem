@@ -50,6 +50,7 @@
 | 仓库 | 定位 | 三元语义 |
 |---|---|---|
 | [sanjiu-nine](https://github.com/q1z2q3-debug/sanjiu-nine) | ★主仓：符号体系+诗词APK+深度卦典+人类卦辞 | D承载/R审定/T增益 |
+| [tne-core](https://github.com/q1z2q3-debug/tne-core) | ★认知引擎 TNE-Core：坐标服务+认知轨迹库+动力引擎(张力/变算子)+可审计认知层 | 可定位·可泛化·可审计 |
 | [tri9-cog](https://github.com/q1z2q3-debug/tri9-cog) | 三元九维认知空间 | T时/S空/C因果 |
 | [cog-layer](https://github.com/q1z2q3-debug/cog-layer) | 九维三值认知层（Agent挂载） | 通用三值 |
 | [btcu-harness](https://github.com/q1z2q3-debug/btcu-harness) | 平衡三元认知单元（LLM架构） | {-1,0,+1} |
