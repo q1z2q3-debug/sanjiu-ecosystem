@@ -41,6 +41,7 @@ const nodes = [
   {id:'cog',name:'cog-layer\n体用变时空势因果缘',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
   {id:'heal',name:'heal-belief\n体用变·疗愈',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
   {id:'hexq',name:'hexq-prod\n体用变·1-based',category:1,symbolSize:36,itemStyle:{color:'#38b6a5'}},
+  {id:'tne',name:'tne-core\n认知引擎·可审计',category:1,symbolSize:40,itemStyle:{color:'#38b6a5'}},
   // 应用落地层
   {id:'apk',name:'sanjiu-apk-builder\nAPK构建插件',category:2,symbolSize:32,itemStyle:{color:'#f0a500'}},
   {id:'poem',name:'卦典·诗歌·APK\n(卦辞/人类转译/诗词)',category:2,symbolSize:32,itemStyle:{color:'#f0a500'}},
@@ -54,6 +55,7 @@ const nodes = [
 const links = [
   {source:'core',target:'nine'},{source:'core',target:'tri9'},{source:'core',target:'meihua'},{source:'core',target:'xiuq'},
   {source:'core',target:'cog'},{source:'core',target:'heal'},{source:'core',target:'hexq'},
+  {source:'core',target:'tne'},
   {source:'nine',target:'apk'},{source:'nine',target:'poem'},
   {source:'meihua',target:'meihuaapp'},{source:'xiuq',target:'xiuqapp'},
   {source:'nine',target:'arch'},{source:'nine',target:'alpha'},{source:'nine',target:'sfw'},
